@@ -11,7 +11,7 @@ class VerifierB64Data
     public $data;
 
     public function __construct($b64data, $length) {
-        $decoded = base64_decode($b64data);
+        $decoded = base64_decode($b64data, true);
         $alg = substr($decoded, 0, 2);
         if ($alg !== self::PKALG) {
           throw new VerifierException(sprintf('Unexpected algorithm string %s', $alg));
