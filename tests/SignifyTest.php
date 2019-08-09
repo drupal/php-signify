@@ -30,6 +30,9 @@ class SignifyTest extends TestCase
      $public_key = file_get_contents(__DIR__ . '/fixtures/test1-php-signify.pub');
      $var = new Verifier($public_key);
      $this->assertSame($public_key, $var->getPublicKeyRaw());
+     $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
+     $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
+     $this->assertEquals($message, $var->verifyMessage($signature, $message));
   }
 }
 
