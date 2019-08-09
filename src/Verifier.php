@@ -1,8 +1,8 @@
 <?php
 
-namespace DrupalAssociation;
+namespace DrupalAssociation\Signify;
 
-class Signify
+class Verifier
 {
    public function testMethod(){
 	return "drupal";
