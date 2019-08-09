@@ -3,6 +3,7 @@
 namespace DrupalAssociation\Signify\Tests;
 
 use PHPUnit\Framework\TestCase;
+use DrupalAssociation\Signify\Verifier;
 
 /**
  *  Tests for the Signify class.
@@ -17,7 +18,7 @@ class SignifyTest extends TestCase
    */
   public function testIsThereAnySyntaxError()
   {
-     $var = new \DrupalAssociation\Signify\Verifier();
+     $var = new Verifier('drupal');
      $this->assertTrue(is_object($var));
   }
 
@@ -26,8 +27,9 @@ class SignifyTest extends TestCase
    */
   public function testMethod()
   {
-     $var = new \DrupalAssociation\Signify\Verifier();
-     $this->assertSame($var->testMethod(), 'drupal');
+     $public_key = file_get_contents(__DIR__ . '/fixtures/test1-php-signify.pub');
+     $var = new Verifier($public_key);
+     $this->assertSame($public_key, $var->getPublicKey());
   }
 }
 
