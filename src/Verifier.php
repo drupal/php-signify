@@ -78,6 +78,9 @@ class Verifier
      * @param string $msg
      *   The string message (e.g. the contents of the file that was signed).
      *
+     * @throws VerifierException
+     *   Thrown when the verification failed.
+     *
      * @return string
      *   The message if the verification passed.
      */
