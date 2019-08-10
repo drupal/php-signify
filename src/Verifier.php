@@ -13,6 +13,9 @@ class Verifier
      */
     protected $publicKeyRaw;
 
+    /**
+     * @var VerifierB64Data
+     */
     protected $publicKey;
 
     /**
@@ -73,28 +76,37 @@ class Verifier
     /**
      * Verify a string message.
      *
-     * @param string $signature
+     * @param string $signed_message
      *   The string contents of the signature (e.g. the contents of the file)
-     * @param string $msg
-     *   The string message (e.g. the contents of the file that was signed).
-     *
-     * @throws VerifierException
-     *   Thrown when the verification failed.
      *
      * @return string
      *   The message if the verification passed.
+     * @throws \SodiumException
+     * @throws VerifierException
+     *   Thrown when the message was not verified by the signature.
      */
-    public function verifyMessage($signature, $msg = '') {
+    public function verifyMessage($signed_message) {
         $pubkey = $this->getPublicKey();
+
+        // Simple split of signify signature and embedded message; input validation occurs later.
+        $embedded_message_index = 0;
+        for($i = 1; $i <= 2 && $embedded_message_index !== false; $i++) {
+            $embedded_message_index = strpos($signed_message, "\n", $embedded_message_index + 1);
+        }
+        $signature = substr($signed_message, 0, $embedded_message_index + 1);
+        $message = substr($signed_message, $embedded_message_index + 1);
+        if ($message === false) {
+            $message = '';
+        }
+
         $sig = $this->parseB64String($signature, SODIUM_CRYPTO_SIGN_BYTES);
         if ($pubkey->keyNum !== $sig->keyNum) {
             throw new VerifierException('verification failed: checked against wrong key');
         }
-        $valid = sodium_crypto_sign_verify_detached($sig->data, $msg, $pubkey->data);
+        $valid = sodium_crypto_sign_verify_detached($sig->data, $message, $pubkey->data);
         if (!$valid) {
             throw new VerifierException('Signature did not match');
         }
-        return $msg;
+        return $message;
     }
-
 }

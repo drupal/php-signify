@@ -34,7 +34,20 @@ class SignifyTest extends TestCase
         $this->assertSame($public_key, $var->getPublicKeyRaw());
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
-        $this->assertEquals($message, $var->verifyMessage($signature, $message));
+        $this->assertEquals($message, $var->verifyMessage($signature . $message));
+    }
+
+    /**
+     * Tests a successful embedded signature and message verification.
+     */
+    public function testVerifyEmbeddedMessage()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/embed.pub');
+        $var = new Verifier($public_key);
+        $this->assertSame($public_key, $var->getPublicKeyRaw());
+        $signature_and_message = file_get_contents(__DIR__ . '/fixtures/embed.sig');
+        $message = "Hello, world.\n";
+        $this->assertEquals($message, $var->verifyMessage($signature_and_message));
     }
 
     /**
@@ -47,7 +60,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
-        $var->verifyMessage($signature, $message);
+        $var->verifyMessage($signature . $message);
     }
 
     /**
@@ -60,7 +73,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php') . 'bad message';
-        $var->verifyMessage($signature, $message);
+        $var->verifyMessage($signature . $message);
     }
 
     /**
