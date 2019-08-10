@@ -1,0 +1,3 @@
+untrusted comment: verify with checksumlist.pub
+RWRc1GLN1Gh3IgLA6z+BdbjR1EocfTYYO4wQHavSKwdDTG4Bl6DwoVdGzSi9tiWL3KA/FhqgsnP9J0lNwVF/+0LpAM6hXoMqTQQ=
+SHA256 (payload.zip) = ad58b17ed05a2be4afbace3765942bab3329779808507b422c9966c099e1654c
