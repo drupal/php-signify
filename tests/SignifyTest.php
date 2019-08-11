@@ -40,13 +40,13 @@ class SignifyTest extends TestCase
     /**
      * Tests a successful embedded signature and message verification.
      */
-    public function testVerifyEmbeddedMessage()
+    public function testPositiveVerificationEmbeddedMessage()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/embed.pub');
         $var = new Verifier($public_key);
         $this->assertSame($public_key, $var->getPublicKeyRaw());
         $signature_and_message = file_get_contents(__DIR__ . '/fixtures/embed.sig');
-        $message = "Hello, world.\n";
+        $message = file_get_contents(__DIR__ . '/fixtures/embed.txt');
         $this->assertEquals($message, $var->verifyMessage($signature_and_message));
     }
 
@@ -112,5 +112,20 @@ class SignifyTest extends TestCase
             array($wrong_comment, 'comment must start with'),
             array($epic_comment, sprintf('comment longer than %d bytes', Verifier::COMMENTMAXLEN))
         );
+    }
+
+    public function testVerifyChecksumList()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
+        $this->assertEquals(1, $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/fixtures'));
+    }
+
+    public function testVerifyChecksumFile()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $this->assertEquals(1, $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist.sig'));
     }
 }

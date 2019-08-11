@@ -8,6 +8,9 @@ class Verifier
     const COMMENTHDRLEN = 19;
     const COMMENTMAXLEN = 1024;
 
+    // Allowed checksum list verification algorithms and their base64-encoded lengths.
+    protected $HASH_ALGO_BASE64_LENGTHS = array('SHA256' => 64, 'SHA512' => 128);
+
     /**
      * @var string
      */
@@ -77,7 +80,7 @@ class Verifier
      * Verify a string message.
      *
      * @param string $signed_message
-     *   The string contents of the signature (e.g. the contents of the file)
+     *   The string contents of the signify signature and message (e.g. the contents of the file)
      *
      * @return string
      *   The message if the verification passed.
@@ -88,7 +91,7 @@ class Verifier
     public function verifyMessage($signed_message) {
         $pubkey = $this->getPublicKey();
 
-        // Simple split of signify signature and embedded message; input validation occurs later.
+        // Simple split of signify signature and embedded message; input validation occurs in parseB64String().
         $embedded_message_index = 0;
         for($i = 1; $i <= 2 && $embedded_message_index !== false; $i++) {
             $embedded_message_index = strpos($signed_message, "\n", $embedded_message_index + 1);
@@ -108,5 +111,101 @@ class Verifier
             throw new VerifierException('Signature did not match');
         }
         return $message;
+    }
+
+    /**
+     * Verify a signed checksum list, and then verify the checksum for each file in the list.
+     *
+     * @param string $signed_checksum_list
+     *   Contents of a signify signature file whose message is a file checksum list.
+     * @param string $working_directory
+     *   A directory on the filesystem that the file checksum list is relative to.
+     * @throws \SodiumException
+     * @throws VerifierException
+     *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
+     * @return int
+     *   The number of files verified.
+     */
+    public function verifyChecksumList($signed_checksum_list, $working_directory)
+    {
+        $checksum_list_raw = $this->verifyMessage($signed_checksum_list);
+        $checksum_list = $this->parseChecksumList($checksum_list_raw, true);
+        $verified_count = 0;
+
+        /**
+         * @var VerifierFileChecksum $file_checksum
+         */
+        foreach ($checksum_list as $file_checksum)
+        {
+            $actual_hash = hash_file(strtolower($file_checksum->algorithm), $working_directory . DIRECTORY_SEPARATOR . $file_checksum->filename);
+            if ($actual_hash === false) {
+                throw new VerifierException("File \"$file_checksum->filename\" in the checksum list could not be read.");
+            }
+
+            if (strcmp($actual_hash, $file_checksum->hex_hash) !== 0)
+            {
+                throw new VerifierException("File \"$file_checksum->filename\" does not pass checksum verification.");
+            }
+
+            $verified_count++;
+        }
+
+        return $verified_count;
+    }
+
+    /**
+     * Verify the a signed checksum list file, and then verify the checksum for each file in the list.
+     *
+     * @param string $checksum_file
+     *   The filename of a signed checksum list file.
+     * @return int
+     *   The number of files that were successfully verified.
+     * @throws \SodiumException
+     * @throws VerifierException
+     *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
+     */
+    public function verifyChecksumFile($checksum_file) {
+        $absolute_path = realpath($checksum_file);
+        if (empty($absolute_path))
+        {
+            throw new VerifierException("The real path of checksum list file at \"$checksum_file\" could not be determined.");
+        }
+        $working_directory = dirname($absolute_path);
+        $signed_checksum_list = file_get_contents($absolute_path);
+        if (empty($signed_checksum_list))
+        {
+            throw new VerifierException("The checksum list file at \"$checksum_file\" could not be read.");
+        }
+
+        return $this->verifyChecksumList($signed_checksum_list, $working_directory);
+    }
+
+    protected function parseChecksumList($checksum_list_raw, $list_is_trusted)
+    {
+        $lines = explode("\n", $checksum_list_raw);
+        $verified_checksums = array();
+        foreach ($lines as $line) {
+            if (trim($line) == '') {
+                continue;
+            }
+
+            if (substr($line, 0, 1) === '\\') {
+                throw new VerifierException('Filenames with problematic characters are not yet supported.');
+            }
+
+            $algo = substr($line, 0, strpos($line, ' '));
+            if (empty($this->HASH_ALGO_BASE64_LENGTHS[$algo])) {
+                throw new VerifierException("Algorithm \"$algo\" is unsupported for checksum verification.");
+            }
+
+            $filename_start = strpos($line, '(') + 1;
+            $bytes_after_filename = $this->HASH_ALGO_BASE64_LENGTHS[$algo] + 4;
+            $filename = substr($line, $filename_start, -$bytes_after_filename);
+
+            $verified_checksum = new VerifierFileChecksum($filename, $algo, substr($line, -$this->HASH_ALGO_BASE64_LENGTHS[$algo]), $list_is_trusted);
+            $verified_checksums[] = $verified_checksum;
+        }
+
+        return $verified_checksums;
     }
 }
