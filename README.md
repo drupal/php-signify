@@ -112,8 +112,10 @@ line.
 
 #### Example CLI Creation of a CSIG File
 
-    $ signify -G -p root.pub -s root.sec
-    $ signify -G -p intermediate.pub -s intermediate.sec
+For convenience, this example uses the `-n` option to disable passphrases.
+
+    $ signify -G -n -p root.pub -s root.sec
+    $ signify -G -n -p intermediate.pub -s intermediate.sec
     $ date --utc --iso-8601 --date="+30 days" > expiration
     $ cat expiration intermediate.pub | signify -S -e -s root.sec -m - -x intermediate.crt
     $ sha512sum --tag module.zip > checksum-list
