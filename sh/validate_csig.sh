@@ -4,10 +4,10 @@ rootpubkey=$1
 csigfile=$2
 
 >&2 echo Validating csig $2 using trusted root public key $1
-sigofint=$(mktemp /tmp/intsigmsg.XXXXXX)
-head --lines=5 $csigfile | signify -V -p $rootpubkey -m - > $intsig
+expsigofint=$(mktemp /tmp/intsigmsg.XXXXXX)
+head --lines=5 $csigfile | signify -V -p $rootpubkey -m - > $expsigofint
 today=$(date --utc --iso-8601)
-expiration=$(head --lines=1 $intsig)
+expiration=$(head --lines=1 $expsigofint)
 if [[ "$today" > "$expiration" ]] ; then
   >&2 echo Intermediate key expired on $expiration (today is $today in UTC)
   exit 1
