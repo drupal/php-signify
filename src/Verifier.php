@@ -80,7 +80,7 @@ class Verifier
      * Verify a string message.
      *
      * @param string $signed_message
-     *   The string contents of the signify signature and message (e.g. the contents of the file)
+     *   The string contents of the signify signature and message (e.g. the contents of a .sig file.)
      *
      * @return string
      *   The message if the verification passed.
@@ -137,9 +137,12 @@ class Verifier
          */
         foreach ($checksum_list as $file_checksum)
         {
-            $actual_hash = hash_file(strtolower($file_checksum->algorithm), $working_directory . DIRECTORY_SEPARATOR . $file_checksum->filename);
+            $actual_hash = @hash_file(strtolower($file_checksum->algorithm), $working_directory . DIRECTORY_SEPARATOR . $file_checksum->filename);
             if ($actual_hash === false) {
                 throw new VerifierException("File \"$file_checksum->filename\" in the checksum list could not be read.");
+            }
+            if (empty($actual_hash) || strlen($actual_hash) < 64) {
+                throw new VerifierException("Failure computing hash for file \"$file_checksum->filename\" in the checksum list.");
             }
 
             if (strcmp($actual_hash, $file_checksum->hex_hash) !== 0)
@@ -207,5 +210,49 @@ class Verifier
         }
 
         return $verified_checksums;
+    }
+
+    /**
+     * @param string $chained_signed_message
+     *   The string contents of the root/intermediate chained signify signature and message (e.g. the contents of a .csig file.)
+     * @param string $now
+     *   The current date in ISO-8601 (YYYY-MM-DD) (optional.)
+     *
+     * @return string
+     *   The message if the verification passed.
+     * @throws \SodiumException
+     * @throws VerifierException
+     *   Thrown when the message was not verified.
+     */
+    public function verifyCsigMessage($chained_signed_message, $now = '')
+    {
+        $csig_lines = explode("\n", $chained_signed_message, 6);
+        $root_signed_intermediate_key_and_validity = implode("\n", array_slice($csig_lines, 0, 5)) . "\n";
+        $this->verifyMessage($root_signed_intermediate_key_and_validity);
+
+        $valid_through_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $csig_lines[2]);
+        if (! $valid_through_dt instanceof \DateTimeImmutable)
+        {
+            throw new VerifierException('Unexpected valid-through date format.');
+        }
+        if (empty($now))
+        {
+            $now = date('Y-m-d');
+        }
+        $now_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $now);
+        if (! $now_dt instanceof \DateTimeImmutable)
+        {
+            throw new VerifierException('Unexpected date format of current date.');
+        }
+
+        $diff = $now_dt->diff($valid_through_dt);
+        if ($diff->invert) {
+            throw new VerifierException(sprintf('The intermediate key expired %d day(s) ago.', $diff->days));
+        }
+
+        $intermediate_pubkey = implode("\n", array_slice($csig_lines, 3, 2)) . "\n";
+        $chained_verifier = new self($intermediate_pubkey);
+        $signed_message = implode("\n", array_slice($csig_lines, 5));
+        return $chained_verifier->verifyMessage($signed_message);
     }
 }

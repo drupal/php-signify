@@ -1,0 +1,8 @@
+untrusted comment: verify with root.pub
+RWQUd2b7SZIioLTSPupjYYkI3OaNhchJEDQFH1TaPNSpDofCs1R8NK2gILKBFBbGH0D7liH0YvL9s4JEN4LH7Vdoqr03VahAjAQ=
+2019-09-10
+untrusted comment: test intermediate public key
+RWRFrxhIVhCtA/DTGMXt27VL5x4Xx3EApCDRccFdAexKALzZA/NotsZ8
+untrusted comment: verify with int.pub
+RWRFrxhIVhCtA9TmgSZj2gta+MLh6ktD3kZ8iyOOY9Ikx0N7tG0QmXPX6f1m1SvcC38CLoeeI22Ls+te46CRnmJZuGDZt+RLlA4=
+SHA512 (payload.zip) = c3d7e5cd9b117c602e6a3063a9c6f28171a65678fbc0789c1517eecd02f4542267f2db0a59e32a35763abcf0f7601df2b7e2d792c1fa2b9f18bfafa61c121380
