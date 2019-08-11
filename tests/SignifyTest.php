@@ -128,4 +128,49 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $this->assertEquals(1, $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist.sig'));
     }
+
+    /**
+     * @expectedException \DrupalAssociation\Signify\VerifierException
+     * @expectedExceptionMessage File "payload-compromised.zip" does not pass checksum verification.
+     */
+    public function testChecksumFileCompromisedArchive()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist-compromised.sig');
+    }
+
+    /**
+     * @expectedException \DrupalAssociation\Signify\VerifierException
+     * @expectedExceptionMessage The real path of checksum list file at
+     */
+    public function testChecksumFileMissing()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $var->verifyChecksumFile(__DIR__ . '/fixtures/not_a_file');
+    }
+
+    /**
+     * @expectedException \DrupalAssociation\Signify\VerifierException
+     * @expectedExceptionMessage could not be read.
+     */
+    public function testChecksumFileItselfUnreadable()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $var->verifyChecksumFile(__DIR__ . '/fixtures');
+    }
+
+    /**
+     * @expectedException \DrupalAssociation\Signify\VerifierException
+     * @expectedExceptionMessage File "payload.zip" in the checksum list could not be read.
+     */
+    public function testChecksumListUnreadableFile()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
+        $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
+    }
 }
