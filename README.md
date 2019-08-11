@@ -110,11 +110,20 @@ line.
     RWQ5TWYMFcc7gpE7lJZ2dbMK/x9iUPD08lfjGQtha9n4qIW/h7kQBjBcaYNNNKzQpJY3Xjgttm+TkxqlQNpz9sT+48mgC+xjCgY=
     SHA512 (module.zip) = f53bef3e52bcbd7d822190a7458706ff5a4b10066a52e843ef10779b55f2b6ad16c928b42def63b2204af1e7c0baaf8d9ab1d172e2b78174626f42da90a15904
 
-#### Example CLI Manipulation of CSIG File
+#### Example CLI Creation of a CSIG File
 
-    $ head --lines=5 module.csig | signify -V -p root.pub -m - > expiration-and-build-pubkey
-    $ head --lines=1 expiration-and-build-pubkey  # Displays expiration. Should be on or after today.
-    $ tail --lines=2 expiration-and-build-pubkey > trusted-build-infra-key.pub
+    $ signify -G -p root.pub -s root.sec
+    $ signify -G -p intermediate.pub -s intermediate.sec
+    $ date --utc --iso-8601 --date="+30 days" > expiration
+    $ cat expiration intermediate.pub | signify -S -e -s root.sec -m - -x intermediate.crt
+    $ sha512sum --tag module.zip > checksum-list
+    $ signify -S -e -s intermediate.sec -m checksum-list -x module.csig
+
+#### Example CLI Validation of CSIG File
+
+    $ head --lines=5 module.csig | signify -V -p root.pub -m - > expiration-and-intermediate-pubkey
+    $ head --lines=1 expiration-and-intermediate-pubkey  # Displays expiration. Should be on or after today.
+    $ tail --lines=2 expiration-and-intermediate-pubkey > trusted-intermediate-key.pub
     $ tail --lines=+6 module.csig | signify -C -p trusted-build-infra-key.pub -x -
 
 ## Running Tests
