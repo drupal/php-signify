@@ -174,15 +174,23 @@ class SignifyTest extends TestCase
         $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
     }
 
+    public function testDefaultGetNow()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
+        $var = new Verifier($public_key);
+        $now = new \DateTimeImmutable();
+        $this->assertLessThan(5, $now->diff($var->getNow())->s);
+    }
+
     /**
      * @dataProvider positiveCsigVerificationProvider
      */
     public function testPositiveCsigVerification($now)
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key);
+        $var = new Verifier($public_key, $now);
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $message = $var->verifyCsigMessage($chained_signed_message, '2019-09-10');
+        $message = $var->verifyCsigMessage($chained_signed_message);
 
         $this->assertEquals(
             "SHA512 (payload.zip) = c3d7e5cd9b117c602e6a3063a9c6f28171a65678fbc0789c1517eecd02f4542267f2db0a59e32a35763abcf0f7601df2b7e2d792c1fa2b9f18bfafa61c121380\n",
@@ -202,8 +210,23 @@ class SignifyTest extends TestCase
     public function testExpiredCsigVerification()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key);
+        $var = new Verifier($public_key,'2019-09-11');
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $message = $var->verifyCsigMessage($chained_signed_message, '2019-09-11');
+        $var->verifyCsigMessage($chained_signed_message);
+    }
+
+    public function testVerifyCsigChecksumList()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
+        $var = new Verifier($public_key, '2019-09-01');
+        $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
+        $this->assertEquals(1, $var->verifyCsigChecksumList($signed_checksumlist, __DIR__ . '/fixtures/intermediate'));
+    }
+
+    public function testVerifyCsigChecksumFile()
+    {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
+        $var = new Verifier($public_key, '2019-09-01');
+        $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig'));
     }
 }
