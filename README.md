@@ -81,24 +81,30 @@ Validating an asset using a CSIG:
 
 ### Format of a CSIG
 
-* Intermediate Certificate
-** Untrusted Comment (1 line)
-** Base64-Encoded Signature by Root Secret Key (1 line)
-** Message
-*** Expiration Date in YYYY-MM-DD Format (1 line)
-*** Build Infrastructure Public Key in Signify Format
-**** Untrusted Comment (1 line)
-**** Base64-Encoded Public Key
-* Signed Checksum List
-** Untrusted Comment (1 line)
-** Base64-Encoded Signature by Build Infrastructure Key (1 line)
-** Message
-*** Checksum List Entries (1 or more lines)
+Bold lines in square brackets are annotations that do not occur in the CSIG.
+
+\* **[Intermediate key and its expiration]**  
+** Untrusted Comment (line #1)  
+** Base64-Encoded Signature by Root Secret Key (line #2)  
+** **[Message]**  
+*** Expiration Date in YYYY-MM-DD Format (line #3)  
+*** **[Build Infrastructure Public Key in Signify Format]**  
+**** "Untrusted" Comment (line #4)  
+**** Base64-Encoded Public Key (line #5)  
+\* **[Message or Checksum List signed with key on lines 4-5]**  
+** Untrusted Comment (line #6)  
+** Base64-Encoded Signature by Build Infrastructure Key (line #7)  
+** **[Message or Checksum List]**  
+*** Message or Checksum List Entries (lines 8+)  
 
 If there is only one checksum list entry, the result should be nine lines,
 including a blank line at the end. Each additional checksum list entry adds one
 line.
 
+A possible point of confusion is that line 4 begins with `untrusted comment`,
+but in fact it is part of the overall message signed by the Root Secret Key.
+This is done to allow easy usage of the Build Infrastructure Public Key in
+Signify format - it must necessarily begin with the bytes `untrusted comment`.
 #### Example CSIG File
 
     untrusted comment: verify with root.pub
@@ -130,8 +136,8 @@ For convenience, this example uses the `-n` option to disable passphrases.
 
 ## Running Tests
 
-    sudo dnf install composer phpunit8
+    sudo dnf install composer
     git clone https://github.com/drupalassociation/php-signify
     cd php-signify
     composer install
-    phpunit8
+    vendor/bin/phpunit
