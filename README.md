@@ -85,21 +85,21 @@ Validating an asset using a CSIG:
 
 ### Format of a CSIG
 
-Bold lines in square brackets are annotations that do not occur in the CSIG.
+Bold lines are annotations that do not occur in the CSIG.
 
-\* **[Intermediate key and its expiration]**  
-** Untrusted Comment (line #1)  
-** Base64-Encoded Signature by Root Secret Key (line #2)  
-** **[Message]**  
-*** Expiration Date in YYYY-MM-DD Format (line #3)  
-*** **[Build Infrastructure Public Key in Signify Format]**  
-**** "Untrusted" Comment (line #4)  
-**** Base64-Encoded Public Key (line #5)  
-\* **[Message or Checksum List signed with key on lines 4-5]**  
-** Untrusted Comment (line #6)  
-** Base64-Encoded Signature by Build Infrastructure Key (line #7)  
-** **[Message or Checksum List]**  
-*** Message or Checksum List Entries (lines 8+)  
+* **Intermediate key and its expiration**
+  * Untrusted Comment (line #1)  
+  * Base64-Encoded Signature by Root Secret Key (line #2)  
+  * *Message*
+    * Expiration Date in YYYY-MM-DD Format (line #3)  
+    * **Build Infrastructure Public Key in Signify Format**  
+      * "Untrusted" Comment (line #4)  
+      * Base64-Encoded Public Key (line #5)  
+* **Message or Checksum List signed with key on lines 4-5**  
+  * Untrusted Comment (line #6)  
+  * Base64-Encoded Signature by Build Infrastructure Key (line #7)  
+  * **Message or Checksum List**  
+    * Message or Checksum List Entries (lines 8+)  
 
 If there is only one checksum list entry, the result should be nine lines,
 including a blank line at the end. Each additional checksum list entry adds one
