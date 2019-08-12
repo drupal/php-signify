@@ -35,7 +35,7 @@ tail -n +2 $message1 > $intpubkey
 today=$(date -u +%Y-%m-%d)
 expiration=$(head -n 1 $message1)
 if [[ "$today" > "$expiration" ]] ; then
-  >&2 echo "Intermediate key expired on $expiration (today is $today in UTC)"
+  >&2 echo "Intermediate key was valid until $expiration (today is $today in UTC)"
   exit 1
 fi
 
