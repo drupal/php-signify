@@ -65,7 +65,7 @@ Initial setup of CSIG infrastructure:
 
 Periodic key rotation on the build infrastructure:
 
-1. Generate a keypair on the build infrastructure.
+1. Generate a keypair on the build infrastructure. This can happen automatically but not be used until promoted into use by the final step.
 1. Use the HSM to sign and embed a message containing an expiration date and the build infrastructure's public key.
 1. Upload that signed message to the build infrastructure. This functions as an intermediate certificate.
 
