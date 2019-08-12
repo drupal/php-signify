@@ -1,5 +1,8 @@
 # PHP Signify
 
+PHP library for verification of BSD Signify signature files, plus PHP and shell
+implementations of verifying extended CSIG signature files.
+
 ## Use Case
 
 Drupal's auto-update and core validation work depend on access to trusted
