@@ -42,7 +42,8 @@ releases are more frequent, but users expect cross-compatibility (and requisite
 signature validation to work) across arbitrary mixes of minor releases and
 module builds. Site owners may also neglect their site across quite a few minor
 releases, making OpenBSD's model of shipping future release keys insufficient
-for maintaining continuity (without, say, shipping the next 10 keys).
+for maintaining continuity (without, say, shipping the next 10 keys and having
+little recourse if one of the corresponding private keys leaks).
 
 Taking a little inspiration from X.509 -- with an emphasis on little -- we've
 extended Signify to support chained signatures. We call this format CSIG.
