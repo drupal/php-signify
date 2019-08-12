@@ -127,19 +127,19 @@ For convenience, this example uses the `-n` option to disable passphrases.
     $ signify -G -n -p root.pub -s root.sec
     $ signify -G -n -p intermediate.pub -s intermediate.sec
     $ date --utc --iso-8601 --date="+30 days" > expiration
-    $ cat expiration intermediate.pub | signify -S -e -s root.sec -m - -x intermediate.epub.sig  # epub = expiring public key
+    $ cat expiration intermediate.pub | signify -S -e -s root.sec -m - -x intermediate.xpub.sig  # xpub = expiring public key
     $ sha512sum --tag module.zip > module-checksum-list
     $ signify -S -e -s intermediate.sec -m module-checksum-list -x module.sig
-    $ cat intermediate.epub.sig module.sig > module.csig
+    $ cat intermediate.xpub.sig module.sig > module.csig
 
 #### Example CLI Validation of CSIG File
 
 Requisite files: `root.pub` `module.zip` `module.csig`
 
-    $ head --lines=5 module.csig > intermediate.epub.sig
-    $ signify -V -e -p root.pub -m intermediate.epub  # Verifies/extracts intermediate.epub.sig, creates intermediate.epub
-    $ head --lines=1 intermediate.epub  # Displays expiration. Should be on or after today.
-    $ tail --lines=2 intermediate.epub > intermediate.pub
+    $ head --lines=5 module.csig > intermediate.xpub.sig
+    $ signify -V -e -p root.pub -m intermediate.xpub  # Verifies/extracts intermediate.xpub.sig, creates intermediate.xpub
+    $ head --lines=1 intermediate.xpub  # Displays expiration. Should be on or after today.
+    $ tail --lines=2 intermediate.xpub > intermediate.pub
     $ tail --lines=+6 module.csig | signify -C -p intermediate.pub -x -
 
 ## Running Tests
