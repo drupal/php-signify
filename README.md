@@ -92,7 +92,7 @@ Bold lines are annotations that do not occur in the CSIG.
   * Base64-Encoded Signature by Root Secret Key (line #2)
   * **Message is an expiring public key, or xpub**
     * Valid Through Date in UTC in YYYY-MM-DD Format (line #3)
-    * **Build Infrastructure Public Key in Signify Format**  
+    * **Build Infrastructure Public Key in Signify Format**
       * "Untrusted" Comment (line #4)
       * Base64-Encoded Public Key (Build Infrastructure Key) (line #5)
 * **Message or Checksum List signed with key on lines 4-5**
