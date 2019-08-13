@@ -277,7 +277,7 @@ class Verifier
         $valid_through_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $csig_lines[2], new \DateTimeZone('UTC'));
         if (! $valid_through_dt instanceof \DateTimeImmutable)
         {
-            throw new VerifierException('Unexpected valid-until date format.');
+            throw new VerifierException('Unexpected valid-through date format.');
         }
         $now_dt = $this->getNow();
 

@@ -26,16 +26,16 @@ head -n 5 $csigfile > $intsig
 
 message1=$(mktemp /tmp/intsigmsg.XXXXXX)
 signify -V -e -x $intsig -p $rootpubkey -m $message1
-expiration=$(head -n 1 $message1)
+validthrough=$(head -n 1 $message1)
 
 intpubkey=$(mktemp /tmp/intsigmsg.XXXXXX)
 tail -n +2 $message1 > $intpubkey
 
 
 today=$(date -u +%Y-%m-%d)
-expiration=$(head -n 1 $message1)
-if [[ "$today" > "$expiration" ]] ; then
-  >&2 echo "Intermediate key was valid until $expiration (today is $today in UTC)"
+validthrough=$(head -n 1 $message1)
+if [[ "$today" > "$validthrough" ]] ; then
+  >&2 echo "Intermediate key was valid through $validthrough (today is $today in UTC)"
   exit 1
 fi
 

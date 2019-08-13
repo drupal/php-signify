@@ -78,7 +78,7 @@ Generating a CSIG for a build:
 Validating an asset using a CSIG:
 
 1. Extract and validate the intermediate certificate against the root public key.
-1. Check that the intermediate certificate remains valid (today in UTC is not after the valid-until date).
+1. Check that the intermediate certificate remains valid (today in UTC is not after the valid-through date).
 1. Extract the intermediate public key from the now-validated intermediate certificate.
 1. Extract the signed checksum list.
 1. Validate the signed checksum list against the intermediate public key.
@@ -91,8 +91,8 @@ Bold lines are annotations that do not occur in the CSIG.
   * Untrusted Comment (line #1)
   * Base64-Encoded Signature by Root Secret Key (line #2)
   * **Message is an expiring public key, or xpub**
-    * Valid Until Date in UTC in YYYY-MM-DD Format (line #3)
-    * **Build Infrastructure Public Key in Signify Format**  
+    * Valid Through Date in UTC in YYYY-MM-DD Format (line #3)
+    * **Build Infrastructure Public Key in Signify Format**
       * "Untrusted" Comment (line #4)
       * Base64-Encoded Public Key (Build Infrastructure Key) (line #5)
 * **Message or Checksum List signed with key on lines 4-5**
@@ -138,7 +138,7 @@ Requisite files: `root.pub` `module.zip` `module.csig`
 
     $ head --lines=5 module.csig > intermediate.xpub.sig
     $ signify -V -e -p root.pub -m intermediate.xpub  # Verifies/extracts intermediate.xpub.sig, creates intermediate.xpub
-    $ head --lines=1 intermediate.xpub  # Displays valid-until date in UTC. Should be on or after the current date in UTC.
+    $ head --lines=1 intermediate.xpub  # Displays valid-through date in UTC. Should be on or after the current date in UTC.
     $ tail --lines=2 intermediate.xpub > intermediate.pub
     $ tail --lines=+6 module.csig | signify -C -p intermediate.pub -x -
 
