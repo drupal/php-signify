@@ -7,10 +7,11 @@ use PHPUnit\Framework\TestCase;
 use DrupalAssociation\Signify\Verifier;
 
 /**
- *  Tests for the Signify class.
+ *  Tests for the \DrupalAssociation\Signify\Verifier class.
  *
  * @author David Strauss
  * @author Mike Baynton
+ * @author Peter Wolanin
  */
 class SignifyTest extends TestCase
 {
@@ -51,8 +52,7 @@ class SignifyTest extends TestCase
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage checked against wrong key
+     * Test using the wrong public key.
      */
     public function testIncorrectPubkey()
     {
@@ -60,12 +60,13 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('checked against wrong key');
         $var->verifyMessage($signature . $message);
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage Signature did not match
+     * Test with a modified message string compared to what was signed.
      */
     public function testIncorrectMessage()
     {
@@ -73,6 +74,8 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php') . 'bad message';
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('Signature did not match');
         $var->verifyMessage($signature . $message);
     }
 
@@ -81,15 +84,10 @@ class SignifyTest extends TestCase
      */
     public function testInvalidPublicKey($public_key, $exception_message)
     {
-        try {
-            $verifier = new Verifier($public_key);
-            $verifier->getPublicKey();
-            $this->fail('Invalid public key did not result in an exception.');
-        } catch (VerifierException $e) {
-            if(is_string($exception_message)) {
-                $this->assertContains($exception_message, $e->getMessage());
-            }
-        }
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage($exception_message);
+        $verifier = new Verifier($public_key);
+        $verifier->getPublicKey();
     }
 
     /**
@@ -130,47 +128,47 @@ class SignifyTest extends TestCase
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage File "payload-compromised.zip" does not pass checksum verification.
      */
     public function testChecksumFileCompromisedArchive()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('File "payload-compromised.zip" does not pass checksum verification.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist-compromised.sig');
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage The real path of checksum list file at
      */
     public function testChecksumFileMissing()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('The real path of checksum list file at');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/not_a_file');
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage could not be read.
      */
     public function testChecksumFileItselfUnreadable()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('could not be read.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures');
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage File "payload.zip" in the checksum list could not be read.
      */
     public function testChecksumListUnreadableFile()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('File "payload.zip" in the checksum list could not be read.');
         $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
     }
 
@@ -204,14 +202,14 @@ class SignifyTest extends TestCase
     }
 
     /**
-     * @expectedException \DrupalAssociation\Signify\VerifierException
-     * @expectedExceptionMessage The intermediate key expired 1 day(s) ago.
      */
     public function testExpiredCsigVerification()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
         $var = new Verifier($public_key,'2019-09-11');
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
+        $this->expectException(VerifierException::class);
+        $this->expectExceptionMessage('The intermediate key expired 1 day(s) ago.');
         $var->verifyCsigMessage($chained_signed_message);
     }
 
