@@ -5,7 +5,7 @@ implementations of verifying extended CSIG signature files.
 
 ## Use Case
 
-Drupal's auto-update and core validation work depend on access to trusted
+Drupal's auto-update and core validation work depends on access to trusted
 metadata and code assets. Because Drupal is deployed globally to diverse
 environments, our implementation should support public and private mirroring
 of data as well as validation by widely varying PHP releases and web host
