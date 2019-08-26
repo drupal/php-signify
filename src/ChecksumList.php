@@ -35,8 +35,6 @@ class ChecksumList implements \Countable, \Iterator {
             $verified_checksum = new VerifierFileChecksum($filename, $algo, substr($line, -$this->HASH_ALGO_BASE64_LENGTHS[$algo]), $list_is_trusted);
             $this->checksums[] = $verified_checksum;
         }
-
-        return $this->checksums;
     }
 
     /**
@@ -78,7 +76,7 @@ class ChecksumList implements \Countable, \Iterator {
      * @inheritDoc
      */
     public function count() {
-        return iterator_count($this);
+        return count($this->checksums);
     }
 
 }
