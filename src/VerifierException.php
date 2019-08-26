@@ -1,5 +1,5 @@
 <?php
 
-namespace DrupalAssociation\Signify;
+namespace Drupal\Signify;
 
 class VerifierException extends \RuntimeException { }

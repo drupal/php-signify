@@ -1,13 +1,13 @@
 <?php
 
-namespace DrupalAssociation\Signify\Tests;
+namespace Drupal\Signify\Tests;
 
-use DrupalAssociation\Signify\VerifierException;
+use Drupal\Signify\VerifierException;
 use PHPUnit\Framework\TestCase;
-use DrupalAssociation\Signify\Verifier;
+use Drupal\Signify\Verifier;
 
 /**
- *  Tests for the \DrupalAssociation\Signify\Verifier class.
+ *  Tests for the \Drupal\Signify\Verifier class.
  *
  * @author David Strauss
  * @author Mike Baynton

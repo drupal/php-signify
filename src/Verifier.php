@@ -1,6 +1,6 @@
 <?php
 
-namespace DrupalAssociation\Signify;
+namespace Drupal\Signify;
 
 class Verifier
 {
@@ -52,10 +52,10 @@ class Verifier
     /**
      * Get the public key data.
      *
-     * @return \DrupalAssociation\Signify\VerifierB64Data
+     * @return \Drupal\Signify\VerifierB64Data
      *   An object with the validated and decoded public key data.
      *
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      */
      public function getPublicKey() {
          if (!$this->publicKey) {
@@ -91,10 +91,10 @@ class Verifier
      * @param int $length
      *   The length of the data, either 32 or 64 bytes.
      *
-     * @return \DrupalAssociation\Signify\VerifierB64Data
+     * @return \Drupal\Signify\VerifierB64Data
      *   An object with the validated and decoded data.
      *
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      */
      public function parseB64String($b64, $length) {
          $parts = explode("\n", $b64);
@@ -122,7 +122,7 @@ class Verifier
      *
      * @throws \SodiumException
      *   Thrown when there is an unexpected crypto error or missing library.
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the message was not verified by the signature.
      */
     public function verifyMessage($signed_message) {
@@ -163,7 +163,7 @@ class Verifier
      *   The number of files verified.
      *
      * @throws \SodiumException
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
      */
     public function verifyChecksumList($signed_checksum_list, $working_directory)
@@ -208,7 +208,7 @@ class Verifier
      * @return int
      *   The number of files that were successfully verified.
      * @throws \SodiumException
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
      */
     public function verifyChecksumFile($checksum_file) {
@@ -265,7 +265,7 @@ class Verifier
      * @return string
      *   The message if the verification passed.
      * @throws \SodiumException
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the message was not verified.
      */
     public function verifyCsigMessage($chained_signed_message)
@@ -304,7 +304,7 @@ class Verifier
      *   The number of files verified.
      *
      * @throws \SodiumException
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
      */
     public function verifyCsigChecksumList($csig_signed_checksum_list, $working_directory)
@@ -323,7 +323,7 @@ class Verifier
      *   The number of files that were successfully verified.
      *
      * @throws \SodiumException
-     * @throws \DrupalAssociation\Signify\VerifierException
+     * @throws \Drupal\Signify\VerifierException
      *   Thrown when the checksum list could not be verified by the signature, or a listed file could not be verified.
      */
     public function verifyCsigChecksumFile($csig_checksum_file)
