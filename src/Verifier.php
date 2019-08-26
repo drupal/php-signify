@@ -8,9 +8,6 @@ class Verifier
     const COMMENTHDRLEN = 19;
     const COMMENTMAXLEN = 1024;
 
-    // Allowed checksum list verification algorithms and their base64-encoded lengths.
-    protected $HASH_ALGO_BASE64_LENGTHS = array('SHA256' => 64, 'SHA512' => 128);
-
     /**
      * @var string
      */
@@ -173,7 +170,7 @@ class Verifier
     }
 
     protected function verifyTrustedChecksumList($checksum_list_raw, $working_directory) {
-        $checksum_list = $this->parseChecksumList($checksum_list_raw, true);
+        $checksum_list = new ChecksumList($checksum_list_raw, true);
         $verified_count = 0;
 
         /**
@@ -225,35 +222,6 @@ class Verifier
         }
 
         return $this->verifyChecksumList($signed_checksum_list, $working_directory);
-    }
-
-    protected function parseChecksumList($checksum_list_raw, $list_is_trusted)
-    {
-        $lines = explode("\n", $checksum_list_raw);
-        $verified_checksums = array();
-        foreach ($lines as $line) {
-            if (trim($line) == '') {
-                continue;
-            }
-
-            if (substr($line, 0, 1) === '\\') {
-                throw new VerifierException('Filenames with problematic characters are not yet supported.');
-            }
-
-            $algo = substr($line, 0, strpos($line, ' '));
-            if (empty($this->HASH_ALGO_BASE64_LENGTHS[$algo])) {
-                throw new VerifierException("Algorithm \"$algo\" is unsupported for checksum verification.");
-            }
-
-            $filename_start = strpos($line, '(') + 1;
-            $bytes_after_filename = $this->HASH_ALGO_BASE64_LENGTHS[$algo] + 4;
-            $filename = substr($line, $filename_start, -$bytes_after_filename);
-
-            $verified_checksum = new VerifierFileChecksum($filename, $algo, substr($line, -$this->HASH_ALGO_BASE64_LENGTHS[$algo]), $list_is_trusted);
-            $verified_checksums[] = $verified_checksum;
-        }
-
-        return $verified_checksums;
     }
 
     /**
