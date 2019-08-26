@@ -13,6 +13,17 @@ configurations. Hosts with outdated root certificates, insecure ciphers, or
 outdated TLS version support should not undermine access to these new Drupal
 features.
 
+This project's security validation is primarily for data recently acquired  over
+the network. It validates downloaded files have not changed. Its purpose is not
+to check already downloaded files. These two scenarios are subtly different.
+
+In the first, files are downloaded, then for security concerns immediately
+validated. The second scenario takes a look at what is already on the filesystem
+and compares against a manifest file of known hashes. We want to validate the
+manifest hasn't changed (it should be signed) via this library. But compairing
+local files against the manifest are a separate concern and should be handled
+independently.
+
 ## Why Signify?
 
 Signify is a defacto standard created by OpenBSD to validate assets using modern
