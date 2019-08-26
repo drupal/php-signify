@@ -191,7 +191,8 @@ class Verifier
                 throw new VerifierException("Failure computing hash for file \"$file_checksum->filename\" in the checksum list.");
             }
             // This method is used because hash_equals was added in PHP 5.6.
-            if (strcmp($actual_hash, $file_checksum->hex_hash) !== 0)
+            // And we don't need timing safe comparisons.
+            if ($actual_hash !== $file_checksum->hex_hash)
             {
                 throw new VerifierException("File \"$file_checksum->filename\" does not pass checksum verification.");
             }
