@@ -1,6 +1,6 @@
 <?php
 
-namespace DrupalAssociation\Signify;
+namespace Drupal\Signify;
 
 class VerifierB64Data
 {
