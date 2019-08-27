@@ -4,7 +4,7 @@ namespace Drupal\Signify;
 
 class ChecksumList implements \Countable, \Iterator {
 
-    // Allowed checksum list verification algorithms and their base64-encoded lengths.
+    // Allowed checksum algorithms and their base-16 (hex) lengths.
     protected $HASH_ALGO_BASE64_LENGTHS = array('SHA256' => 64, 'SHA512' => 128);
 
     protected $checksums = array();
