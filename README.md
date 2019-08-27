@@ -24,6 +24,12 @@ manifest hasn't changed (it should be signed) via this library. But compairing
 local files against the manifest are a separate concern and should be handled
 independently.
 
+An additional facet to consider in this use case is that certificates
+occasionally need to be rotated and Drupal itself has major versions that go
+into LTS mode and various vendors can register to be an "official" LTS vendor.
+In all these cases, we have a need for more than a single signing key. This
+library supports this added use case.
+
 ## Why Signify?
 
 Signify is a defacto standard created by OpenBSD to validate assets using modern
