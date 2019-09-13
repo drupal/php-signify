@@ -229,6 +229,8 @@ class Verifier
      *
      * @param string $chained_signed_message
      *   The string contents of the root/intermediate chained signify signature and message (e.g. the contents of a .csig file.)
+     * @param \DateTimeImmutable $valid_through_dt
+     *   If provided, filled with the valid-through date of the signed message.
      *
      * @return string
      *   The message if the verification passed.
@@ -236,7 +238,7 @@ class Verifier
      * @throws \Drupal\Signify\VerifierException
      *   Thrown when the message was not verified.
      */
-    public function verifyCsigMessage($chained_signed_message)
+    public function verifyCsigMessage($chained_signed_message, \DateTimeImmutable &$valid_through_dt = NULL)
     {
         $csig_lines = explode("\n", $chained_signed_message, 6);
         $root_signed_intermediate_key_and_validity = implode("\n", array_slice($csig_lines, 0, 5)) . "\n";
