@@ -176,7 +176,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->assertLessThan(5, $now->diff($var->getNow())->s);
     }
 
@@ -186,9 +186,9 @@ class SignifyTest extends TestCase
     public function testPositiveCsigVerification($now)
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, $now);
+        $var = new Verifier($public_key);
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $message = $var->verifyCsigMessage($chained_signed_message);
+        $message = $var->verifyCsigMessage($chained_signed_message, $now);
 
         $this->assertEquals(
             "SHA512 (payload.zip) = c3d7e5cd9b117c602e6a3063a9c6f28171a65678fbc0789c1517eecd02f4542267f2db0a59e32a35763abcf0f7601df2b7e2d792c1fa2b9f18bfafa61c121380\n",
@@ -198,7 +198,11 @@ class SignifyTest extends TestCase
 
     public function positiveCsigVerificationProvider()
     {
-        return array(array('2000-01-01'), array('2019-09-09'), array('2019-09-10'));
+        return array(
+            array(new \DateTime('2000-01-01', new \DateTimeZone('UTC'))),
+            array(new \DateTime('2019-09-09', new \DateTimeZone('UTC'))),
+            array(new \DateTime('2019-09-10', new \DateTimeZone('UTC'))),
+        );
     }
 
     /**
@@ -206,25 +210,25 @@ class SignifyTest extends TestCase
     public function testExpiredCsigVerification()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key,'2019-09-11');
+        $var = new Verifier($public_key);
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
         $this->expectException(VerifierException::class);
         $this->expectExceptionMessage('The intermediate key expired 1 day(s) ago.');
-        $var->verifyCsigMessage($chained_signed_message);
+        $var->verifyCsigMessage($chained_signed_message, new \DateTime('2019-09-11', new \DateTimeZone('UTC')));
     }
 
     public function testVerifyCsigChecksumList()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, '2019-09-01');
+        $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $this->assertEquals(1, $var->verifyCsigChecksumList($signed_checksumlist, __DIR__ . '/fixtures/intermediate'));
+        $this->assertEquals(1, $var->verifyCsigChecksumList($signed_checksumlist, __DIR__ . '/fixtures/intermediate', new \DateTime('2019-09-01', new \DateTimeZone('UTC'))));
     }
 
     public function testVerifyCsigChecksumFile()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, '2019-09-01');
-        $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig'));
+        $var = new Verifier($public_key);
+        $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig', new \DateTime('2019-09-01', new \DateTimeZone('UTC'))));
     }
 }
