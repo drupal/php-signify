@@ -5,3 +5,4 @@ composer.lock
 data/output
 docs
 .phpdoc.dist.xml
+builddir/
