@@ -171,13 +171,11 @@ class Verifier
 
     protected function verifyTrustedChecksumList($checksum_list_raw, $working_directory) {
         $checksum_list = new ChecksumList($checksum_list_raw, true);
-        $verified_count = 0;
 
-        /**
-         * @var VerifierFileChecksum $file_checksum
-         */
-        foreach ($checksum_list as $file_checksum)
+        foreach ($checksum_list->getFailedChecksums($working_directory) as $file_checksum)
         {
+            // Don't just rely on a list of failed checksums, throw a more
+            // specific exception.
             $actual_hash = @hash_file(strtolower($file_checksum->algorithm), $working_directory . DIRECTORY_SEPARATOR . $file_checksum->filename);
             if ($actual_hash === false) {
                 throw new VerifierException("File \"$file_checksum->filename\" in the checksum list could not be read.");
@@ -186,15 +184,13 @@ class Verifier
                 throw new VerifierException("Failure computing hash for file \"$file_checksum->filename\" in the checksum list.");
             }
 
-            if (strcmp($actual_hash, $file_checksum->hex_hash) !== 0)
+            if ($actual_hash !== $file_checksum->hex_hash)
             {
                 throw new VerifierException("File \"$file_checksum->filename\" does not pass checksum verification.");
             }
-
-            $verified_count++;
         }
 
-        return $verified_count;
+        return $checksum_list->count();
     }
 
     /**
