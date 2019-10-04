@@ -178,13 +178,16 @@ class Verifier
             // Don't just rely on a list of failed checksums, throw a more
             // specific exception.
             $actual_hash = @hash_file(strtolower($file_checksum->algorithm), $working_directory . DIRECTORY_SEPARATOR . $file_checksum->filename);
+            // If file doesn't exist or isn't readable, hash_file returns false.
             if ($actual_hash === false) {
                 throw new VerifierException("File \"$file_checksum->filename\" in the checksum list could not be read.");
             }
+            // Any hash less than 64 is not secure.
             if (empty($actual_hash) || strlen($actual_hash) < 64) {
                 throw new VerifierException("Failure computing hash for file \"$file_checksum->filename\" in the checksum list.");
             }
-
+            // This method is used because hash_equals was added in PHP 5.6.
+            // And we don't need timing safe comparisons.
             if ($actual_hash !== $file_checksum->hex_hash)
             {
                 throw new VerifierException("File \"$file_checksum->filename\" does not pass checksum verification.");
