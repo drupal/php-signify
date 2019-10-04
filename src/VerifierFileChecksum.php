@@ -1,7 +1,7 @@
 <?php
 
 
-namespace DrupalAssociation\Signify;
+namespace Drupal\Signify;
 
 /**
  * Class VerifierFileChecksum
