@@ -37,17 +37,6 @@ class ChecksumList implements \Countable, \Iterator {
     }
 
     /**
-     * Get failed checksums.
-     *
-     * @param string $working_directory
-     *
-     * @return \Iterator|\Drupal\Signify\VerifierFileChecksum[]
-     */
-    public function getFailedChecksums($working_directory) {
-        return new FailedCheckumFilter($this, $working_directory);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function current() {

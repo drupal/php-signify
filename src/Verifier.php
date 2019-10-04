@@ -171,8 +171,9 @@ class Verifier
 
     protected function verifyTrustedChecksumList($checksum_list_raw, $working_directory) {
         $checksum_list = new ChecksumList($checksum_list_raw, true);
+        $failed_checksum_list =  new FailedCheckumFilter($checksum_list, $working_directory);
 
-        foreach ($checksum_list->getFailedChecksums($working_directory) as $file_checksum)
+        foreach ($failed_checksum_list as $file_checksum)
         {
             // Don't just rely on a list of failed checksums, throw a more
             // specific exception.
