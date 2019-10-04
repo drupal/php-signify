@@ -32,48 +32,47 @@ class ChecksumList implements \Countable, \Iterator {
             $bytes_after_filename = $this->HASH_ALGO_BASE64_LENGTHS[$algo] + 4;
             $filename = substr($line, $filename_start, -$bytes_after_filename);
 
-            $verified_checksum = new VerifierFileChecksum($filename, $algo, substr($line, -$this->HASH_ALGO_BASE64_LENGTHS[$algo]), $list_is_trusted);
-            $this->checksums[] = $verified_checksum;
+            $this->checksums[] = new VerifierFileChecksum($filename, $algo, substr($line, -$this->HASH_ALGO_BASE64_LENGTHS[$algo]), $list_is_trusted);
         }
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function current() {
         return $this->checksums[$this->position];
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function next() {
         $this->position += 1;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function key() {
         return $this->position;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function valid() {
         return isset($this->checksums[$this->position]);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function rewind() {
         $this->position = 0;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function count() {
         return count($this->checksums);
