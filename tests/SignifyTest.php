@@ -2,6 +2,8 @@
 
 namespace Drupal\Signify\Tests;
 
+use Drupal\Signify\ChecksumList;
+use Drupal\Signify\FailedCheckumFilter;
 use Drupal\Signify\VerifierException;
 use PHPUnit\Framework\TestCase;
 use Drupal\Signify\Verifier;
@@ -230,5 +232,29 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
         $var = new Verifier($public_key);
         $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig', new \DateTime('2019-09-01', new \DateTimeZone('UTC'))));
+    }
+
+    public function testMultipleFilesCsig() {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/multiple-files/root.pub');
+        $var = new Verifier($public_key);
+        $contents = file_get_contents(__DIR__ . '/fixtures/multiple-files/module.csig');
+        $files = $var->verifyCsigMessage($contents, new \DateTime('2019-09-20', new \DateTimeZone('UTC')));
+        $checksums = new ChecksumList($files, TRUE);
+
+        // Validate expected checksums exist.
+        $checksums->rewind();
+        $a = $checksums->current();
+        $this->assertEquals('a.txt', $a->filename);
+        $this->assertCount(4, $checksums);
+
+        // Validate failed checkusms.
+        $failed_checksums = new FailedCheckumFilter($checksums, __DIR__ . '/fixtures/multiple-files');
+        $failed_checksums->rewind();
+        $b = $failed_checksums->current();
+        $this->assertEquals('b.txt', $b->filename);
+        $failed_checksums->next();
+        $d = $failed_checksums->current();
+        $this->assertEquals('d.txt', $d->filename);
+        $this->assertCount(2, $failed_checksums);
     }
 }
