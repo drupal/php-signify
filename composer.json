@@ -1,5 +1,5 @@
 {
-    "name": "drupalassociation/php-signify",
+    "name": "drupal/php-signify",
     "description": "Signify-compliant signature verification",
     "keywords": ["signify", "cryptography", "security"],
     "license": "MIT",
@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "DrupalAssociation\\Signify\\": "src/"
+            "Drupal\\Signify\\": "src/"
         }
     },
     "autoload-dev": {},
