@@ -11,7 +11,7 @@ jobs:
         # operating-system: [windows-latest]
         # Windows fails testing on gitlab. Runs fine on local windows.
         operating-system: [ubuntu-latest, macos-latest, windows-latest]
-        php-versions: ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
+        php-versions: ['7.2', '7.3', '7.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     steps:
     - name: Checkout
