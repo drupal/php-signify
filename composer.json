@@ -25,7 +25,7 @@
     "autoload-dev": {
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "phpunit --verbose"
     },
     "extra": {
         "branch-alias": {
