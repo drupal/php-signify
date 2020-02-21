@@ -1,12 +1,12 @@
 <?php
 
-namespace DrupalAssociation\Signify\Tests;
+namespace Drupal\Signify\Tests;
 
 use PHPUnit\Framework\TestCase;
-use DrupalAssociation\Signify\Verifier;
+use Drupal\Signify\Verifier;
 
 /**
- *  Tests for the \DrupalAssociation\Signify\Verifier class.
+ *  Tests for the \Drupal\Signify\Verifier class.
  *
  * @author David Strauss
  * @author Mike Baynton
@@ -59,7 +59,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('checked against wrong key');
         $var->verifyMessage($signature . $message);
     }
@@ -73,7 +73,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php') . 'bad message';
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('Signature did not match');
         $var->verifyMessage($signature . $message);
     }
@@ -83,7 +83,7 @@ class SignifyTest extends TestCase
      */
     public function testInvalidPublicKey($public_key, $exception_message)
     {
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper($exception_message);
         $verifier = new Verifier($public_key);
         $verifier->getPublicKey();
@@ -132,7 +132,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('File "payload-compromised.zip" does not pass checksum verification.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist-compromised.sig');
     }
@@ -143,7 +143,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('The real path of checksum list file at');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/not_a_file');
     }
@@ -154,7 +154,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('is a directory, not a file.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures');
     }
@@ -166,7 +166,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('File "payload.zip" in the checksum list could not be read.');
         $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
     }
@@ -207,7 +207,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
         $var = new Verifier($public_key,'2019-09-11');
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $this->expectExceptionWrapper('\DrupalAssociation\Signify\VerifierException');
+        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('The intermediate key expired 1 day(s) ago.');
         $var->verifyCsigMessage($chained_signed_message);
     }
