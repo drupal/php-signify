@@ -1,13 +1,14 @@
 <phpunit
     bootstrap="vendor/autoload.php"
-    colors="true">
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    stopOnFailure="true">
     <testsuites>
         <testsuite name="Unit Tests">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <logging>
-        <log type="junit" target="junit.xml"/>
-    </logging>
 </phpunit>
 

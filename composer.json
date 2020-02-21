@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "php": "^7.2.3"
+        "php": "^7.2.3",
+        "paragonie/sodium_compat": "^1.10"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0",
@@ -32,4 +33,3 @@
         }
     }
 }
-
