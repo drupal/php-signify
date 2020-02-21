@@ -8,10 +8,10 @@ jobs:
     runs-on: ${{ matrix.operating-system }}
     strategy:
       matrix:
-        #operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        operating-system: [windows-latest]
-        #php-versions: ['7.2', '7.3', '7.4']
-        php-versions: ['7.3']
+        # operating-system: [windows-latest]
+        # Windows fails testing on gitlab. Runs fine on local windows.
+        operating-system: [ubuntu-latest, macos-latest, windows-latest]
+        php-versions: ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     steps:
     - name: Checkout
@@ -23,8 +23,25 @@ jobs:
         php-version: ${{ matrix.php-versions }}
         extensions: mbstring
 
+    - name: Setup problem matchers for PHP
+      run: echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+
+    - name: Setup problem matchers for PHPUnit
+      run: echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
     - name: Validate composer.json and composer.lock
       run: composer validate
+
+    - name: Get composer cache directory
+      id: composer-cache
+      run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+    - name: Cache dependencies
+      uses: actions/cache@v1
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+        restore-keys: ${{ runner.os }}-composer-
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
