@@ -60,7 +60,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('checked against wrong key');
         $var->verifyMessage($signature . $message);
     }
@@ -74,7 +74,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php') . 'bad message';
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('Signature did not match');
         $var->verifyMessage($signature . $message);
     }
@@ -84,7 +84,7 @@ class SignifyTest extends TestCase
      */
     public function testInvalidPublicKey($public_key, $exception_message)
     {
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage($exception_message);
         $verifier = new Verifier($public_key);
         $verifier->getPublicKey();
@@ -133,7 +133,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('File "payload-compromised.zip" does not pass checksum verification.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist-compromised.sig');
     }
@@ -144,7 +144,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('The real path of checksum list file at');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/not_a_file');
     }
@@ -155,7 +155,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('is a directory, not a file.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures');
     }
@@ -167,7 +167,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('File "payload.zip" in the checksum list could not be read.');
         $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
     }
@@ -208,7 +208,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
         $var = new Verifier($public_key,'2019-09-11');
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $this->expectException(VerifierException::class);
+        $this->expectException('\DrupalAssociation\Signify\VerifierException');
         $this->expectExceptionMessage('The intermediate key expired 1 day(s) ago.');
         $var->verifyCsigMessage($chained_signed_message);
     }
