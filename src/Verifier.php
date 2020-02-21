@@ -76,8 +76,8 @@ class Verifier
              $this->now = gmdate('Y-m-d');
          }
 
-         $now_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $this->now, new \DateTimeZone('UTC'));
-         if (!$now_dt instanceof \DateTimeImmutable) {
+         $now_dt = \DateTime::createFromFormat('Y-m-d', $this->now, new \DateTimeZone('UTC'));
+         if (!$now_dt instanceof \DateTime) {
              throw new VerifierException('Unexpected date format of current date.');
          }
          return $now_dt;
@@ -277,8 +277,8 @@ class Verifier
         $root_signed_intermediate_key_and_validity = implode("\n", array_slice($csig_lines, 0, 5)) . "\n";
         $this->verifyMessage($root_signed_intermediate_key_and_validity);
 
-        $valid_through_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $csig_lines[2], new \DateTimeZone('UTC'));
-        if (! $valid_through_dt instanceof \DateTimeImmutable)
+        $valid_through_dt = \DateTime::createFromFormat('Y-m-d', $csig_lines[2], new \DateTimeZone('UTC'));
+        if (! $valid_through_dt instanceof \DateTime)
         {
             throw new VerifierException('Unexpected valid-through date format.');
         }

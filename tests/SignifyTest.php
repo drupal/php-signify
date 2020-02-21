@@ -176,7 +176,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
         $this->assertLessThan(5, $now->diff($var->getNow())->s);
     }
 
