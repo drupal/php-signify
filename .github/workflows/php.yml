@@ -29,11 +29,6 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
 
-    - name: PHPUnit tests
-      uses: php-actions/phpunit@v1
-      with:
-        junit: junit.xml
-
     - name: Run test suite
       run: composer run-script test
 

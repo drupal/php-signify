@@ -6,5 +6,8 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <logging>
+        <log type="junit" target="junit.xml"/>
+    </logging>
 </phpunit>
 
