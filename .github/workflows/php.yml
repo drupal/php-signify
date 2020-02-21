@@ -11,7 +11,7 @@ jobs:
         # operating-system: [windows-latest]
         # Windows fails testing on gitlab. Runs fine on local windows.
         operating-system: [ubuntu-latest, macos-latest, windows-latest]
-        php-versions: ['7.2', '7.3', '7.4']
+        php-versions: ['5.3', '5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3', '7.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     steps:
     - name: Checkout
@@ -32,6 +32,9 @@ jobs:
     - name: Validate composer.json and composer.lock
       run: composer validate
 
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress --no-suggest
+
     - name: Get composer cache directory
       id: composer-cache
       run: echo "::set-output name=dir::$(composer config cache-files-dir)"
@@ -42,9 +45,6 @@ jobs:
         path: ${{ steps.composer-cache.outputs.dir }}
         key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
         restore-keys: ${{ runner.os }}-composer-
-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: Run test suite
       run: composer run-script test
