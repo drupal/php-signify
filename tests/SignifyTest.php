@@ -2,6 +2,8 @@
 
 namespace Drupal\Signify\Tests;
 
+use Drupal\Signify\ChecksumList;
+use Drupal\Signify\FailedCheckumFilter;
 use PHPUnit\Framework\TestCase;
 use Drupal\Signify\Verifier;
 
@@ -59,7 +61,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php');
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('checked against wrong key');
         $var->verifyMessage($signature . $message);
     }
@@ -73,7 +75,7 @@ class SignifyTest extends TestCase
         $var = new Verifier($public_key);
         $signature = file_get_contents(__DIR__ . '/fixtures/artifact1.php.sig');
         $message = file_get_contents(__DIR__ . '/fixtures/artifact1.php') . 'bad message';
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('Signature did not match');
         $var->verifyMessage($signature . $message);
     }
@@ -83,7 +85,7 @@ class SignifyTest extends TestCase
      */
     public function testInvalidPublicKey($public_key, $exception_message)
     {
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper($exception_message);
         $verifier = new Verifier($public_key);
         $verifier->getPublicKey();
@@ -132,7 +134,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('File "payload-compromised.zip" does not pass checksum verification.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/checksumlist-compromised.sig');
     }
@@ -143,7 +145,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('The real path of checksum list file at');
         $var->verifyChecksumFile(__DIR__ . '/fixtures/not_a_file');
     }
@@ -154,7 +156,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('is a directory, not a file.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures');
     }
@@ -166,7 +168,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/checksumlist.sig');
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('File "payload.zip" in the checksum list could not be read.');
         $var->verifyChecksumList($signed_checksumlist, __DIR__ . '/intentionally wrong path');
     }
@@ -175,7 +177,7 @@ class SignifyTest extends TestCase
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
-        $now = new \DateTime();
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
         $this->assertLessThan(5, $now->diff($var->getNow())->s);
     }
 
@@ -185,9 +187,9 @@ class SignifyTest extends TestCase
     public function testPositiveCsigVerification($now)
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, $now);
+        $var = new Verifier($public_key);
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $message = $var->verifyCsigMessage($chained_signed_message);
+        $message = $var->verifyCsigMessage($chained_signed_message, $now);
 
         $this->assertEquals(
             "SHA512 (payload.zip) = c3d7e5cd9b117c602e6a3063a9c6f28171a65678fbc0789c1517eecd02f4542267f2db0a59e32a35763abcf0f7601df2b7e2d792c1fa2b9f18bfafa61c121380\n",
@@ -197,7 +199,11 @@ class SignifyTest extends TestCase
 
     public function positiveCsigVerificationProvider()
     {
-        return array(array('2000-01-01'), array('2019-09-09'), array('2019-09-10'));
+        return array(
+            array(new \DateTime('2000-01-01', new \DateTimeZone('UTC'))),
+            array(new \DateTime('2019-09-09', new \DateTimeZone('UTC'))),
+            array(new \DateTime('2019-09-10', new \DateTimeZone('UTC'))),
+        );
     }
 
     /**
@@ -205,26 +211,50 @@ class SignifyTest extends TestCase
     public function testExpiredCsigVerification()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key,'2019-09-11');
+        $var = new Verifier($public_key);
         $chained_signed_message = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $this->expectExceptionWrapper('\Drupal\Signify\VerifierException');
+        $this->expectExceptionWrapper('Drupal\Signify\VerifierException');
         $this->expectExceptionMessageWrapper('The intermediate key expired 1 day(s) ago.');
-        $var->verifyCsigMessage($chained_signed_message);
+        $var->verifyCsigMessage($chained_signed_message, new \DateTime('2019-09-11', new \DateTimeZone('UTC')));
     }
 
     public function testVerifyCsigChecksumList()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, '2019-09-01');
+        $var = new Verifier($public_key);
         $signed_checksumlist = file_get_contents(__DIR__ . '/fixtures/intermediate/checksumlist.csig');
-        $this->assertEquals(1, $var->verifyCsigChecksumList($signed_checksumlist, __DIR__ . '/fixtures/intermediate'));
+        $this->assertEquals(1, $var->verifyCsigChecksumList($signed_checksumlist, __DIR__ . '/fixtures/intermediate', new \DateTime('2019-09-01', new \DateTimeZone('UTC'))));
     }
 
     public function testVerifyCsigChecksumFile()
     {
         $public_key = file_get_contents(__DIR__ . '/fixtures/intermediate/root.pub');
-        $var = new Verifier($public_key, '2019-09-01');
-        $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig'));
+        $var = new Verifier($public_key);
+        $this->assertEquals(1, $var->verifyCsigChecksumFile(__DIR__ . '/fixtures/intermediate/checksumlist.csig', new \DateTime('2019-09-01', new \DateTimeZone('UTC'))));
+    }
+
+    public function testMultipleFilesCsig() {
+        $public_key = file_get_contents(__DIR__ . '/fixtures/multiple-files/root.pub');
+        $var = new Verifier($public_key);
+        $contents = file_get_contents(__DIR__ . '/fixtures/multiple-files/module.csig');
+        $files = $var->verifyCsigMessage($contents, new \DateTime('2019-09-20', new \DateTimeZone('UTC')));
+        $checksums = new ChecksumList($files, TRUE);
+
+        // Validate expected checksums exist.
+        $checksums->rewind();
+        $a = $checksums->current();
+        $this->assertEquals('a.txt', $a->filename);
+        $this->assertCount(4, $checksums);
+
+        // Validate failed checkusms.
+        $failed_checksums = new FailedCheckumFilter($checksums, __DIR__ . '/fixtures/multiple-files');
+        $failed_checksums->rewind();
+        $b = $failed_checksums->current();
+        $this->assertEquals('b.txt', $b->filename);
+        $failed_checksums->next();
+        $d = $failed_checksums->current();
+        $this->assertEquals('d.txt', $d->filename);
+        $this->assertCount(2, $failed_checksums);
     }
 
     public function expectExceptionWrapper($exception)
@@ -235,6 +265,7 @@ class SignifyTest extends TestCase
             $this->setExpectedException($exception);
         }
     }
+
     public function expectExceptionMessageWrapper($message)
     {
         if (is_callable(array('parent', 'expectExceptionMessage'))) {
