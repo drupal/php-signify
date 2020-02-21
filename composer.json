@@ -10,8 +10,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.3",
-        "ext-sodium": "*"
+        "php": "^7.2.3"
     },
     "require-dev": {
         "phpunit/phpunit": "^8.0",
