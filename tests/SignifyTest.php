@@ -228,7 +228,7 @@ class SignifyTest extends TestCase
 
     public function expectExceptionWrapper($exception)
     {
-        if (is_callable(['parent', 'expectException'])) {
+        if (is_callable(array('parent', 'expectException'))) {
             parent::expectException($exception);
         } else {
             $this->setExpectedException($exception);
@@ -236,7 +236,7 @@ class SignifyTest extends TestCase
     }
     public function expectExceptionMessageWrapper($message)
     {
-        if (is_callable(['parent', 'expectExceptionMessage'])) {
+        if (is_callable(array('parent', 'expectExceptionMessage'))) {
             parent::expectExceptionMessage($message);
         } else {
             $this->setExpectedException('\Exception', $message);
