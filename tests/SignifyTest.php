@@ -156,7 +156,7 @@ class SignifyTest extends TestCase
         $public_key = file_get_contents(__DIR__ . '/fixtures/checksumlist.pub');
         $var = new Verifier($public_key);
         $this->expectException(VerifierException::class);
-        $this->expectExceptionMessage('could not be read.');
+        $this->expectExceptionMessage('is a directory, not a file.');
         $var->verifyChecksumFile(__DIR__ . '/fixtures');
     }
 
