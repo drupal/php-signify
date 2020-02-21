@@ -23,6 +23,7 @@
         }
     },
     "autoload-dev": {
+      "psr-4": { "DrupalAssociation\\Signify\\Tests\\": "tests/" }
     },
     "scripts": {
         "test": "phpunit --verbose"

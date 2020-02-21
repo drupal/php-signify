@@ -2,7 +2,6 @@
 
 namespace DrupalAssociation\Signify\Tests;
 
-use DrupalAssociation\Signify\VerifierException;
 use PHPUnit\Framework\TestCase;
 use DrupalAssociation\Signify\Verifier;
 
@@ -15,6 +14,7 @@ use DrupalAssociation\Signify\Verifier;
  */
 class SignifyTest extends TestCase
 {
+    use PhpUnitPolyfillTrait;
 
     /**
      * Check for valid syntax.
