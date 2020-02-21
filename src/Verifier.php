@@ -97,7 +97,7 @@ class Verifier
      * @throws \DrupalAssociation\Signify\VerifierException
      */
      public function parseB64String($b64, $length) {
-         $parts = preg_split('/\n|\r\n|\r/', $b64);
+         $parts = explode("\n", $b64);
          if (count($parts) !== 3) {
              throw new VerifierException("Invalid format; must contain two newlines, one after comment and one after base64");
          }
@@ -130,12 +130,12 @@ class Verifier
 
         // Simple split of signify signature and embedded message; input
         // validation occurs in parseB64String().
-        $signed_message_array = preg_split('/\n|\r\n|\r/', $signed_message);
-        if (empty($signed_message_array[0] || empty($signed_message_array[1]))) {
-            throw new VerifierException('Signature is empty.');
+        $embedded_message_index = 0;
+        for($i = 1; $i <= 2 && $embedded_message_index !== false; $i++) {
+            $embedded_message_index = strpos($signed_message, "\n", $embedded_message_index + 1);
         }
-        $signature = implode(PHP_EOL, array_slice($signed_message_array, 0, 2)) . PHP_EOL;
-        $message = implode(PHP_EOL, array_slice($signed_message_array, 2));
+        $signature = substr($signed_message, 0, $embedded_message_index + 1);
+        $message = substr($signed_message, $embedded_message_index + 1);
         if ($message === false) {
             $message = '';
         }
@@ -232,7 +232,7 @@ class Verifier
 
     protected function parseChecksumList($checksum_list_raw, $list_is_trusted)
     {
-        $lines = preg_split('/\n|\r\n|\r/', $checksum_list_raw);
+        $lines = explode("\n", $checksum_list_raw);
         $verified_checksums = array();
         foreach ($lines as $line) {
             if (trim($line) == '') {
@@ -273,8 +273,8 @@ class Verifier
      */
     public function verifyCsigMessage($chained_signed_message)
     {
-        $csig_lines = preg_split('/\n|\r\n|\r/', $chained_signed_message);
-        $root_signed_intermediate_key_and_validity = implode(PHP_EOL, array_slice($csig_lines, 0, 5)) . PHP_EOL;
+        $csig_lines = explode("\n", $chained_signed_message, 6);
+        $root_signed_intermediate_key_and_validity = implode("\n", array_slice($csig_lines, 0, 5)) . "\n";
         $this->verifyMessage($root_signed_intermediate_key_and_validity);
 
         $valid_through_dt = \DateTimeImmutable::createFromFormat('Y-m-d', $csig_lines[2], new \DateTimeZone('UTC'));
@@ -289,9 +289,9 @@ class Verifier
             throw new VerifierException(sprintf('The intermediate key expired %d day(s) ago.', $diff->days));
         }
 
-        $intermediate_pubkey = implode(PHP_EOL, array_slice($csig_lines, 3, 2)) . PHP_EOL;
+        $intermediate_pubkey = implode("\n", array_slice($csig_lines, 3, 2)) . "\n";
         $chained_verifier = new self($intermediate_pubkey);
-        $signed_message = implode(PHP_EOL, array_slice($csig_lines, 5));
+        $signed_message = implode("\n", array_slice($csig_lines, 5));
         return $chained_verifier->verifyMessage($signed_message);
     }
 
