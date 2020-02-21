@@ -15,6 +15,14 @@ if (version_compare($php_unit_version, '7.0.0') < 0) {
                 $this->setExpectedException($exception);
             }
         }
+        public function expectExceptionMessage($message)
+        {
+            if (is_callable(['parent', 'expectExceptionMessage'])) {
+                parent::expectExceptionMessage($message);
+            } else {
+                $this->expectedExceptionMessage = $message;
+            }
+        }
     }
 } else {
     trait PhpUnitPolyfillTrait

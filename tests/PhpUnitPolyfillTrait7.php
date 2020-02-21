@@ -12,4 +12,13 @@ trait PhpUnitPolyfillTrait7
             $this->setExpectedException($exception);
         }
     }
+
+    public function expectExceptionMessage(string $message): void
+    {
+        if (is_callable(['parent', 'expectExceptionMessage'])) {
+            parent::expectExceptionMessage($message);
+        } else {
+            $this->setExpectedException('\Exception', $message);
+        }
+    }
 }
