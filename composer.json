@@ -10,6 +10,7 @@
         }
     ],
     "require": {
+        "php": "5.3.0",
         "paragonie/sodium_compat": "^1.10"
     },
     "require-dev": {
