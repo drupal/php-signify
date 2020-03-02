@@ -215,6 +215,9 @@ class Verifier
             throw new VerifierException("The real path of checksum list file at \"$checksum_file\" could not be determined.");
         }
         $working_directory = dirname($absolute_path);
+        if (is_dir($absolute_path)) {
+            throw new VerifierException("The checksum list file at \"$checksum_file\" is a directory, not a file.");
+        }
         $signed_checksum_list = @file_get_contents($absolute_path);
         if (empty($signed_checksum_list))
         {
@@ -308,6 +311,9 @@ class Verifier
             throw new VerifierException("The real path of checksum list file at \"$csig_checksum_file\" could not be determined.");
         }
         $working_directory = dirname($absolute_path);
+        if (is_dir($absolute_path)) {
+            throw new VerifierException("The checksum list file at \"$csig_checksum_file\" is a directory, not a file.");
+        }
         $signed_checksum_list = file_get_contents($absolute_path);
         if (empty($signed_checksum_list))
         {

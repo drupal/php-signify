@@ -3,6 +3,8 @@
 PHP library for verification of BSD Signify signature files, plus PHP and shell
 implementations of verifying extended CSIG signature files.
 
+![PHP Composer](https://github.com/drupal/php-signify/workflows/PHP%20Composer/badge.svg)
+
 ## Use Case
 
 Drupal's auto-update and core validation work depends on access to trusted
